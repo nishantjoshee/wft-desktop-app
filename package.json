@@ -1,0 +1,39 @@
+{
+  "name": "wft-desktop-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder"
+  },
+  "author": "Nishant",
+  "license": "ISC",
+  "build": {
+    "appId": "com.waterflow.desktoputility",
+    "productName": "WFT Desktop Utility",
+    "win": {
+      "requestedExecutionLevel": "requireAdministrator",
+      "target": [
+        "nsis",
+        "zip"
+      ]
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  },
+  "dependencies": {
+    "auto-launch": "^5.0.6",
+    "axios": "^1.6.5",
+    "os-utils": "^0.0.14"
+  },
+  "devDependencies": {
+    "electron": "^28.1.4",
+    "electron-builder": "^24.9.1"
+  }
+}
