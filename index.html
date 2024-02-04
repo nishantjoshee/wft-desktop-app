@@ -2,11 +2,35 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Hello World!</title>
+    <title>WFT Desktop App</title>
     <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Connection status: <strong id='status'></strong></h1>
+    <div style="padding:40px;">
+        <h1>Connection status: <div id="status"></div></h1>
+    
+        <div class="container" style="margin-top: 20px; margin-bottom: 30px;">
+            <div class="row">
+                <div class="col-md-4">
+                    <div id="cpu">
+                        <button type="button" class="btn btn-outline-primary" style="width: 150px;">Loading ...</button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div id="memory">
+                        <button type="button" class="btn btn-outline-primary" style="width: 150px;">Loading ...</button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div>
+                        <button id="platform" type="button" class="btn btn-outline-info" style="width: 150px;">Loading ...</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div id="log-data"></div>
+
     <script src="renderer.js"></script>
 </body>
 </html>

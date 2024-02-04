@@ -4,6 +4,7 @@
   "description": "",
   "main": "main.js",
   "scripts": {
+    "watch": "nodemon --exec electron .",
     "start": "electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder"
@@ -34,6 +35,7 @@
   },
   "devDependencies": {
     "electron": "^28.1.4",
-    "electron-builder": "^24.9.1"
+    "electron-builder": "^24.9.1",
+    "nodemon": "^3.0.3"
   }
 }

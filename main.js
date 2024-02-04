@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const axios = require('axios');
 const Autolaunch = require("auto-launch");
@@ -12,8 +12,10 @@ function createWindow() {
     width: 800,
     height: 600,
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
+      nodeIntegration : true,
+      contextIsolation : false,
+    },
+    resizable : false
   });
 
   win.loadFile('index.html');
@@ -26,7 +28,7 @@ function createWindow() {
       .catch(error => {
         console.error('API Error:', error);
       });
-  }, 5000);
+  }, 500000);
 }
 
 app.whenReady().then(() => {
