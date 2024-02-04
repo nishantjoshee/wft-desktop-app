@@ -1,4 +1,7 @@
-exports.updateSystemLog = () => {
+ const fs = require("fs");
+
+ const filePath = "./log.json";
+ function updateSystemLog  (){
     fs.readFile(filePath, 'utf8', (err, data) => {
         if (err) {
           console.err('Error reading logs', err);
@@ -32,3 +35,5 @@ exports.updateSystemLog = () => {
     
       });
 }
+
+module.exports = {updateSystemLog}

@@ -1,4 +1,7 @@
-exports.updateSystemInfo =() => {
+const osu = require("os-utils");
+const os = require("os");
+
+function updateSystemInfo () {
     setInterval(() => {
         osu.cpuUsage(function (v) {
           let cpuUsage = (v * 100).toFixed(2);
@@ -30,3 +33,4 @@ exports.updateSystemInfo =() => {
         document.getElementById("platform").innerText = os.platform()
       }, 1000)
 }
+module.exports = {updateSystemInfo}

@@ -1,21 +1,31 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const path = require('path');
-const axios = require('axios');
-const Autolaunch = require("auto-launch");
+const {app, BrowserWindow, ipcMain} = require("electron");
+const axios = require("axios");
+const io = require("socket.io-client");
 
-let autoLauncher = new Autolaunch({
-  name : "wft-desktop-app"
-});
+// const Autolaunch = require("auto-launch");
+
+
+function initSocket() {
+  const socket = io("https://ci-uat-bak.naasasecurities.com.np");
+  socket.on("connect", () => {
+    console.log("Connected");
+  })
+}
+
+
+// let autoLauncher = new Autolaunch({
+//   name: "wft-desktop-app"
+// });
 
 function createWindow() {
   const win = new BrowserWindow({
     width: 800,
     height: 600,
     webPreferences: {
-      nodeIntegration : true,
-      contextIsolation : false,
+      nodeIntegration: true,
+      contextIsolation: false,
     },
-    resizable : false
+    resizable: false
   });
 
   win.loadFile('index.html');
@@ -33,10 +43,12 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
-
+  initSocket();
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
+      createWindow(); 
+      initSocket();
+     
     }
   });
 });

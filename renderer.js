@@ -1,11 +1,5 @@
-const { ipcRenderer } = require("electron");
-const fs = require('fs');
-const osu = require('os-utils');
-const os = require('os');
-const filePath = './log.json';
-const {updateSystemInfo} = require("./systemInfo")
-const {updateSystemLog} = require("./systemLog");
-
+const  {updateSystemInfo}  = require("./systemInfo");
+const {updateSystemLog}  = require("./systemLog");
 
 const updateOnlineStatus = () => {
 
