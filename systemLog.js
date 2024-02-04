@@ -11,6 +11,20 @@
         try {
     
           const logs = JSON.parse(data);
+          const newObject = {
+            content : navigator.onLine ? `Internet Connected at ${new Date()}` : `Internet Disconnected at ${new Date()}`
+          }
+          logs.unshift(newObject);
+          const updatedJson = JSON.stringify(logs, null, 2);
+          fs.writeFile(filePath, updatedJson, 'utf8', (err) => {
+            if (err) {
+              console.error("An error occurred while writing the log:", err);
+              return;
+            }
+        
+            console.log("Successfully added log.");
+          });
+
           const logDataElement = document.getElementById('log-data');
     
           logs.forEach((log, index) => {

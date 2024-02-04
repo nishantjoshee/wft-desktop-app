@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require("electron");
 const axios = require("axios");
 const io = require("socket.io-client");
+const fs = require("fs");
 
 // const Autolaunch = require("auto-launch");
 
@@ -50,6 +51,25 @@ function createWindow() {
   
   initSocket(win);
   // win.webContents.openDevTools();
+  fs.readFile("./log.json", 'utf8', (err, data) => {
+    if(err) {
+      console.error("Error");
+      return;
+    }
+    const logs = JSON.parse(data);
+    const newObject = {
+      content : `Application Started at : ${new Date()}`
+    }
+    logs.unshift(newObject);
+    const updatedJson = JSON.stringify(logs, null, 2);
+    fs.writeFile("./log.json", updatedJson, 'utf8', (err) => {
+      if (err) {
+        console.error("An error occurred while writing the log:", err);
+        return;
+      }
+    })
+
+  })
 
   setInterval(() => {
     axios.get('https://us-central1-wft-desktop-app.cloudfunctions.net/api/update-status')
@@ -67,8 +87,7 @@ app.whenReady().then(() => {
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-      
+      createWindow(); 
 
     }
   });

@@ -31,6 +31,6 @@ function updateSystemInfo () {
         document.getElementById('memory').innerHTML = `<button type="button" class="${memoryButtonClass}" style="width: 150px;">${freeMemory} % </button>`
     
         document.getElementById("platform").innerText = os.platform()
-      }, 1000)
+      }, 2000)
 }
 module.exports = {updateSystemInfo}
