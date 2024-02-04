@@ -1,14 +1,32 @@
-const {app, BrowserWindow, ipcMain} = require("electron");
+const { app, BrowserWindow, ipcMain } = require("electron");
 const axios = require("axios");
 const io = require("socket.io-client");
 
 // const Autolaunch = require("auto-launch");
 
 
-function initSocket() {
-  const socket = io("https://ci-uat-bak.naasasecurities.com.np");
+function initSocket(window) {
+  const socket = io("https://ci-uat-bak.naasasecurities.com.np",
+    {
+      transportOptions: {
+        polling: {
+          extraHeaders: {
+            "Authorization": "remote-command"
+          }
+        }
+      }
+    });
+  socket.on("remote-command", (payload) => {
+    window.webContents.send("remote-command", payload);
+    // console.log("remote command execution");
+  });
+
   socket.on("connect", () => {
-    console.log("Connected");
+    window.webContents.send("remote-connection-status", "Connected");
+  });
+
+  socket.on("disconnect", () => {
+    window.webContents.send("remote-connection-status", "Not Connected");
   })
 }
 
@@ -29,6 +47,9 @@ function createWindow() {
   });
 
   win.loadFile('index.html');
+  
+  initSocket(win);
+  // win.webContents.openDevTools();
 
   setInterval(() => {
     axios.get('https://us-central1-wft-desktop-app.cloudfunctions.net/api/update-status')
@@ -43,12 +64,12 @@ function createWindow() {
 
 app.whenReady().then(() => {
   createWindow();
-  initSocket();
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow(); 
-      initSocket();
-     
+      createWindow();
+      
+
     }
   });
 });
