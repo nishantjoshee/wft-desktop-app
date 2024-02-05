@@ -23,17 +23,15 @@ async function updateSystemLog() {
     });
   });
 }
+
 async function getPreviousLog() {
-  var logData;
-  await fs.readFile(filePath, 'utf8', (err, data) => {
-    if (err) {
-      console.err('Error reading logs', err);
-      return;
-    }
-    logData = JSON.parse(data);
-  });
-  console.log(logData);
-  return logData;
+  try {
+      const data = await fs.readFile(filePath, 'utf8');
+      return JSON.parse(data);
+  } catch (err) {
+      console.error('Error reading logs', err);
+      throw err; 
+  }
 }
 async function writeSystemLog(content) {
   const newEntry = {
