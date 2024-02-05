@@ -1,5 +1,5 @@
 const { updateSystemInfo } = require('./systemInfo');
-const { updateSystemLog } = require('./systemLog');
+const { updateSystemLog, writeSystemLog } = require('./systemLog');
 const { ipcRenderer } = require('electron');
 const { exec } = require('child_process');
 
@@ -54,11 +54,15 @@ ipcRenderer.on('remote-command', (event, arg) => {
 //   ).innerText = `Remote Connection Status : ${arg}`;
 // });
 
-const updateOnlineStatus = () => {
+const updateOnlineStatus = async () => {
   document.getElementById('status').innerHTML = navigator.onLine
     ? 'Internet Connection Status : Online'
     : 'Internet Connection Status : Offline';
-  updateSystemLog();
+  var internetLog = navigator.onLine
+    ? `Internet Connected at : ${new Date()}`
+    : `Internet Disconnected at : ${new Date()}`;
+  await writeSystemLog(internetLog);
+  await updateSystemLog();
   updateSystemInfo();
 };
 
