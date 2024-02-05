@@ -30,7 +30,7 @@ async function getPreviousLog() {
     throw err;
   }
 }
-async function writeSystemLog(content) {
+async function writeSystemLog(content, command) {
   const newEntry = {
     content: content,
   };

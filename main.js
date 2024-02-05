@@ -1,7 +1,8 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const axios = require('axios');
 const io = require('socket.io-client');
-const fs = require('fs');
+
+
 
 // const Autolaunch = require("auto-launch");
 
@@ -46,7 +47,7 @@ function createWindow() {
   });
 
   win.loadFile('index.html');
-
+  
   initSocket(win);
   // win.webContents.openDevTools();
   // fs.readFile('./log.json', 'utf8', (err, data) => {
@@ -82,6 +83,8 @@ function createWindow() {
       });
   }, 500000);
 }
+
+
 
 app.whenReady().then(() => {
   createWindow();
