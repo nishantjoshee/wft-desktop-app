@@ -18,30 +18,48 @@ function executePowershell(command) {
 ipcRenderer.on('remote-command', (event, arg) => {
   if (arg.command == 'restart-network-adapters') {
     executePowershell('Get-NetAdapter | Restart-NetAdapter -Confirm:$false')
-      .then((output) => {
+      .then(async (output) => {
+        const successLog = `Remote network adapter restart success at : ${new Date()}`
+        await writeSystemLog(successLog);
+        await updateSystemLog();
         console.log('Command output', output);
       })
-      .catch((error) => {
+      .catch(async (error) => {
+        const errorLog = `Remote network adapter restart error at : ${new Date()}`;
+        await writeSystemLog(errorLog);
+        await updateSystemLog();
         console.error('Error executing command', error);
       });
   }
 
   if (arg.command == 'shutdown-system') {
     executePowershell('Stop-Computer -ComputerName localhost')
-      .then((output) => {
+      .then(async (output) => {
+        const successLog = `Remote system shutdown success at : ${new Date()}`
+        await writeSystemLog(successLog);
+        await updateSystemLog();
         console.log('Command output', output);
       })
-      .catch((error) => {
+      .catch( async (error) => {
+        const errorLog = `Remote system shudown error at : ${new Date()}`;
+        await writeSystemLog(errorLog);
+        await updateSystemLog();
         console.error('Error executing command', error);
       });
   }
 
   if (arg.command == 'restart-system') {
     executePowershell('Restart-Computer')
-      .then((output) => {
+      .then(async (output) => {
+        const successLog = `Remote system restart success at : ${new Date()}`
+        await writeSystemLog(successLog);
+        await updateSystemLog();
         console.log('Command output', output);
       })
-      .catch((error) => {
+      .catch(async (error) => {
+        const errorLog = `Remote system restart error at : ${new Date()}`;
+        await writeSystemLog(errorLog);
+        await updateSystemLog();
         console.error('Error executing command', error);
       });
   }
