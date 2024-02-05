@@ -3,6 +3,58 @@ const { updateSystemLog, writeSystemLog } = require('./systemLog');
 const { ipcRenderer } = require('electron');
 const { exec } = require('child_process');
 const { checkLastCommand, updateLastCommand, clearLastCommand } = require("./lastCommand")
+const ping = require("ping");
+
+function handleConnectivity() {
+  setInterval(async () => {
+    ping.sys.probe("https://www.google.com", async function (isAlive) {
+      if (isAlive) {
+        await clearLastCommand();
+      }
+      if (!isAlive) {
+        const lastCommand = await checkLastCommand();
+        if (!lastCommand) {
+          // restart adapter
+          executePowershell('Get-NetAdapter | Restart-NetAdapter -Confirm:$false')
+              .then(async (output) => {
+                const successLog = `Remote network adapter restart success at : ${new Date()}`
+                await writeSystemLog(successLog);
+                await updateSystemLog();
+                await updateLastCommand("adapter-restart");
+                console.log('Command output', output);
+              })
+              .catch(async (error) => {
+                const errorLog = `Remote network adapter restart error at : ${new Date()}`;
+                await writeSystemLog(errorLog);
+                await updateSystemLog();
+                console.error('Error executing command', error);
+              });
+        }
+        if (lastCommand == "adapter-restart") {
+          // restart system
+          executePowershell('Restart-Computer')
+            .then(async (output) => {
+              const successLog = `Remote system restart success at : ${new Date()}`
+              await writeSystemLog(successLog);
+              await updateSystemLog();
+              await updateLastCommand("system-restart");
+              console.log('Command output', output);
+            })
+            .catch(async (error) => {
+              const errorLog = `Remote system restart error at : ${new Date()}`;
+              await writeSystemLog(errorLog);
+              await updateSystemLog();
+              console.error('Error executing command', error);
+            });
+        }
+        if (lastCommand == "system-restart") {
+          // do nothing
+        }
+
+      }
+    });
+  }, 5000);
+}
 
 
 function executePowershell(command) {
@@ -87,60 +139,8 @@ const updateOnlineStatus = async () => {
   await writeSystemLog(internetLog);
   await updateSystemLog();
   updateSystemInfo();
-  lastCommand();
+  handleConnectivity();
 };
-
-async function lastCommand() {
-  if (navigator.onLine) {
-    await clearLastCommand();
-  }
-  if (!navigator.onLine) {
-    const lastCommand = await checkLastCommand();
-    if (!lastCommand) {
-      // restart adapter
-      if (lastCommand == 'restart-network-adapters') {
-        executePowershell('Get-NetAdapter | Restart-NetAdapter -Confirm:$false')
-          .then(async (output) => {
-            const successLog = `Remote network adapter restart success at : ${new Date()}`
-            await writeSystemLog(successLog);
-            await updateSystemLog();
-            await updateLastCommand("adapter-restart");
-            console.log('Command output', output);
-          })
-          .catch(async (error) => {
-            const errorLog = `Remote network adapter restart error at : ${new Date()}`;
-            await writeSystemLog(errorLog);
-            await updateSystemLog();
-            console.error('Error executing command', error);
-          });
-      }
-
-
-    }
-    if (lastCommand == "adapter-restart") {
-      // restart system
-      executePowershell('Restart-Computer')
-      .then(async (output) => {
-        const successLog = `Remote system restart success at : ${new Date()}`
-        await writeSystemLog(successLog);
-        await updateSystemLog();
-        await updateLastCommand("system-restart");
-        console.log('Command output', output);
-      })
-      .catch(async (error) => {
-        const errorLog = `Remote system restart error at : ${new Date()}`;
-        await writeSystemLog(errorLog);
-        await updateSystemLog();
-        console.error('Error executing command', error);
-      });
-    }
-    if (lastCommand == "system-restart") {
-      // do nothing
-    }
-  }
-
-}
-
 
 
 window.addEventListener('online', updateOnlineStatus);
