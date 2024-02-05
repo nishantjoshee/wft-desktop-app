@@ -7,6 +7,7 @@ ipcRenderer.on("remote-command", (event, arg) => {
 });
 
 ipcRenderer.on("remote-connection-status", (event, arg) => {
+  console.log(arg);
   document.getElementById("remote-connection-status").innerText = `Remote Connection Status : ${arg}`
 })
 
