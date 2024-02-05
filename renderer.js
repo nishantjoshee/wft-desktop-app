@@ -19,7 +19,7 @@ const ping = require('ping');
 const pingUrl = 'www.google.com sdnvkds';
 
 function handleConnectivity() {
-  let pingInterval = 20000;
+  let pingInterval = 10000;
   setInterval(() => {
     ping.sys.probe(pingUrl, async function (isAlive) {
       if (isAlive) {

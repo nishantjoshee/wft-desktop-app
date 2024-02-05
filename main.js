@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
 const axios = require('axios');
 const io = require('socket.io-client');
+const fs = require("fs").promises;
 
 // const Autolaunch = require("auto-launch");
 
@@ -35,8 +36,8 @@ function initSocket(window) {
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1000,
-    height: 300,
+    width: 800,
+    height: 600,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -47,7 +48,7 @@ function createWindow() {
   win.loadFile('index.html');
 
   initSocket(win);
-  win.webContents.openDevTools();
+  // win.webContents.openDevTools();
 
   setInterval(() => {
     axios
@@ -63,7 +64,26 @@ function createWindow() {
   }, 500000);
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
+
+  try {
+    await fs.access('./lastCommand.json');
+  } catch (err) {
+    if(err.code === 'ENOENT'){
+      const initData = {};
+      await fs.writeFile('./lastCommand.json', JSON.stringify(initData, null, 2), 'utf-8');
+    }
+  }
+
+  try {
+    await fs.access('./log.json');
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      const initialData = [];
+      await fs.writeFile('./log.json', JSON.stringify(initialData, null, 2), 'utf-8');
+    }
+
+  }
   createWindow();
 
   app.on('activate', () => {
