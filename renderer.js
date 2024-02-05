@@ -18,6 +18,10 @@ const {
 const ping = require('ping');
 const pingUrl = 'www.google.com sdnvkds';
 
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 function handleConnectivity() {
   let pingInterval = 20000;
   setInterval(() => {
@@ -31,12 +35,13 @@ function handleConnectivity() {
           // restart adapter
           await updateLastCommand('adapter-restart');
           restartAdapterLocally();
+          // await delay(15000);
           return;
         }
         if (lastCommand == 'adapter-restart') {
           // restart system
           await updateLastCommand('system-restart');
-          // restartSystemLocally();
+          restartSystemLocally();
           return;
         }
         if (lastCommand == 'system-restart') {
