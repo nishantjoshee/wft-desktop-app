@@ -31,12 +31,13 @@ function handleConnectivity() {
           // restart adapter
           await updateLastCommand('adapter-restart');
           restartAdapterLocally();
+          // await delay(15000);
           return;
         }
         if (lastCommand == 'adapter-restart') {
           // restart system
           await updateLastCommand('system-restart');
-          // restartSystemLocally();
+          restartSystemLocally();
           return;
         }
         if (lastCommand == 'system-restart') {
