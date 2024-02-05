@@ -2,8 +2,6 @@ const { app, BrowserWindow, ipcMain } = require('electron');
 const axios = require('axios');
 const io = require('socket.io-client');
 
-
-
 // const Autolaunch = require("auto-launch");
 
 function initSocket(window) {
@@ -37,8 +35,8 @@ function initSocket(window) {
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 1200,
-    height: 600,
+    width: 1000,
+    height: 300,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: false,
@@ -47,27 +45,8 @@ function createWindow() {
   });
 
   win.loadFile('index.html');
-  
+
   initSocket(win);
-  // win.webContents.openDevTools();
-  // fs.readFile('./log.json', 'utf8', (err, data) => {
-  //   if (err) {
-  //     console.error('Error');
-  //     return;
-  //   }
-  //   const logs = JSON.parse(data);
-  //   const newObject = {
-  //     content: `Application Started at : ${new Date()}`,
-  //   };
-  //   logs.unshift(newObject);
-  //   const updatedJson = JSON.stringify(logs, null, 2);
-  //   fs.writeFile('./log.json', updatedJson, 'utf8', (err) => {
-  //     if (err) {
-  //       console.error('An error occurred while writing the log:', err);
-  //       return;
-  //     }
-  //   });
-  // });
   win.webContents.openDevTools();
 
   setInterval(() => {
@@ -83,8 +62,6 @@ function createWindow() {
       });
   }, 500000);
 }
-
-
 
 app.whenReady().then(() => {
   createWindow();

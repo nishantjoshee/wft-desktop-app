@@ -2,12 +2,26 @@ const { updateSystemInfo } = require('./systemInfo');
 const { updateSystemLog, writeSystemLog } = require('./systemLog');
 const { ipcRenderer } = require('electron');
 const { exec } = require('child_process');
-const { checkLastCommand, updateLastCommand, clearLastCommand } = require("./lastCommand")
-const ping = require("ping");
+const {
+  restartAdapterLocally,
+  restartAdapterRemotely,
+  restartSystemLocally,
+  restartSystemRemotely,
+  shutdownSystemLocally,
+  shutdownSystemRemotely,
+} = require('./commands');
+const {
+  checkLastCommand,
+  updateLastCommand,
+  clearLastCommand,
+} = require('./lastCommand');
+const ping = require('ping');
+const pingUrl = 'www.google.com sdnvkds';
 
 function handleConnectivity() {
-  setInterval(async () => {
-    ping.sys.probe("https://www.google.com", async function (isAlive) {
+  let pingInterval = 20000;
+  setInterval(() => {
+    ping.sys.probe(pingUrl, async function (isAlive) {
       if (isAlive) {
         await clearLastCommand();
       }
@@ -15,135 +29,64 @@ function handleConnectivity() {
         const lastCommand = await checkLastCommand();
         if (!lastCommand) {
           // restart adapter
-          executePowershell('Get-NetAdapter | Restart-NetAdapter -Confirm:$false')
-              .then(async (output) => {
-                const successLog = `Remote network adapter restart success at : ${new Date()}`
-                await writeSystemLog(successLog);
-                await updateSystemLog();
-                await updateLastCommand("adapter-restart");
-                console.log('Command output', output);
-              })
-              .catch(async (error) => {
-                const errorLog = `Remote network adapter restart error at : ${new Date()}`;
-                await writeSystemLog(errorLog);
-                await updateSystemLog();
-                console.error('Error executing command', error);
-              });
+          await updateLastCommand('adapter-restart');
+          restartAdapterLocally();
+          return;
         }
-        if (lastCommand == "adapter-restart") {
+        if (lastCommand == 'adapter-restart') {
           // restart system
-          executePowershell('Restart-Computer')
-            .then(async (output) => {
-              const successLog = `Remote system restart success at : ${new Date()}`
-              await writeSystemLog(successLog);
-              await updateSystemLog();
-              await updateLastCommand("system-restart");
-              console.log('Command output', output);
-            })
-            .catch(async (error) => {
-              const errorLog = `Remote system restart error at : ${new Date()}`;
-              await writeSystemLog(errorLog);
-              await updateSystemLog();
-              console.error('Error executing command', error);
-            });
+          await updateLastCommand('system-restart');
+          // restartSystemLocally();
+          return;
         }
-        if (lastCommand == "system-restart") {
+        if (lastCommand == 'system-restart') {
           // do nothing
+          return;
         }
-
       }
     });
-  }, 5000);
-}
-
-
-function executePowershell(command) {
-  return new Promise((resolve, reject) => {
-    exec(`powershell.exe -Command "${command}"`, (error, stdout, stderr) => {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(stdout);
-      }
-    });
-  });
+  }, pingInterval);
 }
 
 ipcRenderer.on('remote-command', (event, arg) => {
   if (arg.command == 'restart-network-adapters') {
-    executePowershell('Get-NetAdapter | Restart-NetAdapter -Confirm:$false')
-      .then(async (output) => {
-        const successLog = `Remote network adapter restart success at : ${new Date()}`
-        await writeSystemLog(successLog);
-        await updateSystemLog();
-        console.log('Command output', output);
-      })
-      .catch(async (error) => {
-        const errorLog = `Remote network adapter restart error at : ${new Date()}`;
-        await writeSystemLog(errorLog);
-        await updateSystemLog();
-        console.error('Error executing command', error);
-      });
+    restartAdapterRemotely();
   }
 
   if (arg.command == 'shutdown-system') {
-    executePowershell('Stop-Computer -ComputerName localhost')
-      .then(async (output) => {
-        const successLog = `Remote system shutdown success at : ${new Date()}`
-        await writeSystemLog(successLog);
-        await updateSystemLog();
-        console.log('Command output', output);
-      })
-      .catch(async (error) => {
-        const errorLog = `Remote system shudown error at : ${new Date()}`;
-        await writeSystemLog(errorLog);
-        await updateSystemLog();
-        console.error('Error executing command', error);
-      });
+    shutdownSystemRemotely();
   }
 
   if (arg.command == 'restart-system') {
-    executePowershell('Restart-Computer')
-      .then(async (output) => {
-        const successLog = `Remote system restart success at : ${new Date()}`
-        await writeSystemLog(successLog);
-        await updateSystemLog();
-        console.log('Command output', output);
-      })
-      .catch(async (error) => {
-        const errorLog = `Remote system restart error at : ${new Date()}`;
-        await writeSystemLog(errorLog);
-        await updateSystemLog();
-        console.error('Error executing command', error);
-      });
+    restartSystemRemotely();
   }
 });
 
-// ipcRenderer.on('remote-connection-status', (event, arg) => {
-//   console.log(arg, 'test');
-//   document.getElementById(
-//     'remote-connection-status'
-//   ).innerText = `Remote Connection Status : ${arg}`;
-// });
-
 const updateOnlineStatus = async () => {
-  document.getElementById('status').innerHTML = navigator.onLine
-    ? 'Internet Connection Status : Online'
-    : 'Internet Connection Status : Offline';
+  setInterval(async () => {
+    ping.sys.probe(pingUrl, async function (isAlive) {
+      if (isAlive) {
+        document.getElementById('status').innerHTML =
+          'Internet Connection Status : Online';
+      }
+      if (!isAlive) {
+        document.getElementById('status').innerHTML =
+          'Internet Connection Status : Offline';
+      }
+    });
+  }, 1000);
 
   var internetLog = navigator.onLine
     ? `Internet Connected at : ${new Date()}`
     : `Internet Disconnected at : ${new Date()}`;
 
-
-  await writeSystemLog(internetLog);
-  await updateSystemLog();
+  // await writeSystemLog(internetLog);
+  // await updateSystemLog();
   updateSystemInfo();
-  handleConnectivity();
 };
-
 
 window.addEventListener('online', updateOnlineStatus);
 window.addEventListener('offline', updateOnlineStatus);
 
 updateOnlineStatus();
+handleConnectivity();
