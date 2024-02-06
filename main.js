@@ -3,7 +3,6 @@ const axios = require('axios');
 const io = require('socket.io-client');
 const fs = require("fs").promises;
 
-// const Autolaunch = require("auto-launch");
 
 function initSocket(window) {
   const socket = io('https://ci-uat-bak.naasasecurities.com.np', {
@@ -30,9 +29,6 @@ function initSocket(window) {
   });
 }
 
-// let autoLauncher = new Autolaunch({
-//   name: "wft-desktop-app"
-// });
 
 function createWindow() {
   const win = new BrowserWindow({
