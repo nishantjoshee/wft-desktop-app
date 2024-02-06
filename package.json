@@ -13,17 +13,8 @@
   "license": "ISC",
   "build": {
     "appId": "com.waterflow.desktoputility",
-    "productName": "wft",
-    "directories" : {
-      "buildResources" : "build"
-    },
-    "nsis" : {
-      "include": "build/installer.nsh",
-    "oneClick": false,
-    "allowToChangeInstallationDirectory": true
-    },
+    "productName": "wft-desktop-app",
     "win": {
-      "artifactName" : "${productName}-setup-${version}.${ext}",
       "requestedExecutionLevel": "requireAdministrator",
       "target": [
         "nsis",
